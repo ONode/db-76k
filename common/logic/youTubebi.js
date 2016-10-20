@@ -10,7 +10,7 @@ var api = "AIzaSyCG_xyQEnd6NsBRvunrjpqiBrWPBQfx0PU";
 var playlistid = "PLr2mLhT8gDUK-pMnT4tJKRwUn2FxNNhAU";
 var playlist = "https://www.googleapis.com/youtube/v3/playlists";
 const __parentDir = path.dirname(module.main);
-const show_debug_list = true;
+const show_debug_list = false;
 var dlworker = function () {
   this._staticYT = new YouTube();
   this._staticYT.setKey(api);
@@ -21,6 +21,65 @@ var dlworker = function () {
 };
 dlworker.prototype.setdb = function (object_db) {
   this.video_clip_db = object_db;
+};
+var ensure_input = function (v) {
+  if (_.isEmpty(v)) {
+    return "";
+  } else {
+    return v;
+  }
+};
+
+var ensure_int = function (v) {
+  return parseInt(v);
+};
+var processThumbnails = function (from_snippet) {
+  var outp = {};
+  if (_.isEmpty(from_snippet.thumbnails)) {
+    return outp;
+  }
+  var from_thumbnails = from_snippet.thumbnails;
+  try {
+    if (!_.isUndefined(from_thumbnails.default)) {
+      outp.default = {};
+      outp.default.url = ensure_input(from_thumbnails.default.url);
+      outp.default.width = ensure_input(from_thumbnails.default.width);
+      outp.default.height = ensure_input(from_thumbnails.default.height);
+    }
+
+    if (!_.isUndefined(from_thumbnails.medium)) {
+      outp.medium = {};
+      outp.medium.url = ensure_input(from_thumbnails.medium.url);
+      outp.medium.width = ensure_input(from_thumbnails.medium.width);
+      outp.medium.height = ensure_input(from_thumbnails.medium.height);
+    }
+
+    if (!_.isUndefined(from_thumbnails.high)) {
+      outp.high = {};
+      outp.high.url = ensure_input(from_thumbnails.high.url);
+      outp.high.width = ensure_input(from_thumbnails.high.width);
+      outp.high.height = ensure_input(from_thumbnails.high.height);
+    }
+
+    if (!_.isUndefined(from_thumbnails.standard)) {
+      outp.standard = {};
+      outp.standard.url = ensure_input(from_thumbnails.standard.url);
+      outp.standard.width = ensure_input(from_thumbnails.standard.width);
+      outp.standard.height = ensure_input(from_thumbnails.standard.height);
+    }
+
+    if (!_.isUndefined(from_thumbnails.maxres)) {
+      outp.maxres = {};
+      outp.maxres.url = ensure_input(from_thumbnails.maxres.url);
+      outp.maxres.width = ensure_input(from_thumbnails.maxres.width);
+      outp.maxres.height = ensure_input(from_thumbnails.maxres.height);
+    }
+  } catch (e) {
+    console.log("> item", "=error=", e);
+    console.log("> item", "=review properties=", from_thumbnails);
+    return outp;
+  }
+  return outp;
 };
 dlworker.prototype.updateInfo = function (item, callback_next) {
   if (show_debug_list) {
@@ -43,60 +102,42 @@ dlworker.prototype.updateInfo = function (item, callback_next) {
       if (_.isEmpty(r)) {
         console.log("> ==========================");
         console.log("> Create Clip Data ===============");
-        console.log("> ========================");
-        this.video_clip_db.create({
-          "yt": {
-            "clipid": item.snippet.resourceId.videoId,
-            "publishedT": item.snippet.publishedAt,
-            "title": item.snippet.title,
-            "description": item.snippet.description,
-            "thumbsnails": {
-              "default": {
-                "url": item.snippet.thumbnails.default.url,
-                "width": item.snippet.thumbnails.default.width,
-                "height": item.snippet.thumbnails.default.height
-              },
-              "medium": {
-                "url": item.snippet.thumbnails.medium.url,
-                "width": item.snippet.thumbnails.medium.width,
-                "height": item.snippet.thumbnails.medium.height
-              },
-              "high": {
-                "url": item.snippet.thumbnails.high.url,
-                "width": item.snippet.thumbnails.high.width,
-                "height": item.snippet.thumbnails.high.height
-              },
-              "standard": {
-                "url": item.snippet.thumbnails.standard.url,
-                "width": item.snippet.thumbnails.standard.width,
-                "height": item.snippet.thumbnails.standard.height
-              },
-              "maxres": {
-                "url": item.snippet.thumbnails.maxres.url,
-                "width": item.snippet.thumbnails.maxres.width,
-                "height": item.snippet.thumbnails.maxres.height
-              }
+        if (_.isFunction(this.video_clip_db.create)) {
+          this.video_clip_db.create({
+            "yt": {
+              "clipid": item.snippet.resourceId.videoId,
+              "publishedT": ensure_input(item.snippet.publishedAt),
+              "title": ensure_input(item.snippet.title),
+              "description": ensure_input(item.snippet.description),
+              "thumbsnails": processThumbnails(item.snippet)
+            },
+
+            "listing": {
+              "enabled": true,
+              "searchable": true
             }
-          },
-          "listing.enabled": true,
-          "listing.searchable": true
-        }, function (err, rcallback) {
-          console.log("> clip data created ===================== :: ", item.snippet.resourceId.videoId);
-          if (_.isFunction(callback_next)) {
-            callback_next();
-          }
-        });
+
+          }, function (err, clip) {
+            console.log("> clip data created ===================== :: ", item.snippet.resourceId.videoId);
+            if (_.isFunction(callback_next)) {
+              if (_.isError(err)) {
+                return callback_next(err);
+              }
+              return callback_next();
+            }
+          });
+        }
       } else {
         console.log("> clip data skipped ===================== :: ", item.snippet.resourceId.videoId);
         if (_.isFunction(callback_next)) {
-          callback_next();
+          return callback_next();
         }
       }
-    });
+    }.bind(this));
   } else {
     if (_.isFunction(callback_next)) {
       console.log("> no db is found =====================");
-      callback_next();
+      return callback_next();
     }
   }
 };
@@ -114,23 +155,40 @@ dlworker.prototype.initList = function () {
       this.NextToken = nextPage;
       this.totalResult = result.pageInfo.totalResults;
       this.itemPerPage = result.pageInfo.resultsPerPage;
-      async.forEachOf(result.items, function (val, key, callback) {
-        this.updateInfo(val, function () {
-          if (key == this.itemPerPage - 1) {
-            if (!_.isUndefined(this.NextToken)) {
-              this.nextPage();
-            } else {
-              console.log("> item", "Scan for this playlist complete..");
-            }
+      var t = 0;
+      async.eachSeries(
+        result.items,
+
+        function (val, callback_nxt_iter) {
+
+          this.updateInfo(val,
+
+            function (err) {
+              if (_.isError(err)) {
+                return callback_nxt_iter(err);
+              } else {
+                if (t == this.itemPerPage - 1) {
+                  if (!_.isUndefined(this.NextToken)) {
+                    this.nextPage();
+                  } else {
+                    console.log("> item", "Scan for this playlist complete..");
+                  }
+                } else {
+                  t++;
+                  callback_nxt_iter();
+                }
+              }
+            }.bind(this));
+        }.bind(this),
+
+
+        function done(err) {
+          if (_.isError(err)) {
+            console.error(err.message);
           }
-          callback();
         });
 
-      }.bind(this), function (err) {
-        if (_.isError(err)) {
-          console.error(err.message);
-        }
-      });
+
     }
   }.bind(this));
 
