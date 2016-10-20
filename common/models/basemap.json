@@ -1,0 +1,144 @@
+{
+  "name": "Basemap",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "generated": true,
+      "required": false
+    },
+    "fast_id": {
+      "type": "number",
+      "generated": true,
+      "id": true,
+      "required": false,
+      "doc": "This is the secondary ID used to identify a basemap"
+    },
+    "complete": {
+      "type": "number",
+      "required": true
+    },
+    "total_zoom_levels": {
+      "type": [
+        {
+          "scale": "number",
+          "width": "number",
+          "height": "number",
+          "x": "number",
+          "y": "number",
+          "size": "number",
+          "level": "number",
+          "tiles": [
+            {
+              "x": "number",
+              "y": "number",
+              "tile": {
+                "x": "number",
+                "y": "number"
+              }
+            }
+          ]
+        }
+      ],
+      "required": false
+    },
+    "folder_base_name": {
+      "type": "string",
+      "required": true
+    },
+    "secret_base_map_file": {
+      "type": "string",
+      "required": true
+    },
+    "rename_file": {
+      "type": "string",
+      "required": true
+    },
+    "price": {
+      "default": 0,
+      "type": "number",
+      "required": true
+    },
+    "baseprice": {
+      "default": 0,
+      "type": "number",
+      "required": true
+    },
+    "estprice": {
+      "type": "string"
+    },
+    "currency": {
+      "default": "HKD",
+      "type": "string",
+      "required": true
+    },
+    "owner": {
+      "type": "string"
+    },
+    "image_type": {
+      "type": "string"
+    },
+    "image_meta": {
+      "type": {
+        "dimension": {
+          "type": {
+            "x": "number",
+            "y": "number",
+            "r": "number"
+          }
+        },
+        "material": "number",
+        "shape": "number",
+        "cat": "number",
+        "topic": "number",
+        "path": "array",
+        "tag": "string",
+        "city": "string",
+        "country": "string",
+        "era_native": "string",
+        "article_name_native": "string",
+        "measure_unit": "string",
+        "publication": "string",
+        "introduction": "string",
+        "frame_color": "string",
+        "backdrop_color": "string",
+        "frame_width": "number",
+        "frame_shadow": "number"
+      }
+    },
+    "listing": {
+      "type": {
+        "enabled": "Boolean",
+        "violations": "array",
+        "meta_ready": "Boolean",
+        "date_auction_from": "Date",
+        "date_auction_to": "Date",
+        "status_sold": "Date",
+        "searchable": "Boolean"
+      }
+    },
+    "createtime": {
+      "type": "Date",
+      "default": "$now",
+      "required": false
+    },
+    "updatetime": {
+      "type": "Date",
+      "default": "$now",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {
+    "user": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": "publisherId"
+    }
+  },
+  "acls": [
+  ],
+  "methods": []
+}

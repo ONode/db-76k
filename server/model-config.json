@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ]
+  },
+  "User": {
+    "dataSource": "rocket_us_east",
+    "options": {
+      "emailVerificationRequired": false
+    },
+    "public": false
+  },
+  "user": {
+    "dataSource": "rocket_us_east",
+    "options": {
+      "emailVerificationRequired": false
+    },
+    "public": true
+  },
+  "AccessToken": {
+    "dataSource": "rocket_us_east",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "rocket_us_east",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "rocket_us_east",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "rocket_us_east",
+    "public": false
+  },
+  "CoffeeShop": {
+    "dataSource": "rocket_us_east",
+    "public": true
+  },
+  "Review": {
+    "dataSource": "rocket_us_east",
+    "public": true
+  },
+  "Issue": {
+    "dataSource": "rocket_us_east",
+    "public": true
+  },
+  "Reviewer": {
+    "dataSource": "rocket_us_east",
+    "public": true
+  },
+  "Basemap": {
+    "dataSource": "rocket_us_east",
+    "public": true
+  },
+  "Email": {
+    "dataSource": "gmail_data_source"
+  }
+}

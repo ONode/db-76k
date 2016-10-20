@@ -1,0 +1,89 @@
+{
+  "name": "Videotuba",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "generated": true,
+      "required": false
+    },
+    "sync": {
+      "type": {
+        "url": "string"
+      }
+    },
+    "keyword": {
+      "type": "array",
+      "required": false
+    },
+    "yt": {
+      "type": {
+        "clipid": "string",
+        "publishedT": "Date",
+        "title": "string",
+        "description": "string",
+        "thumbsnails": {
+          "default": {
+            "url": "string",
+            "width": "number",
+            "height": "number"
+          },
+          "medium": {
+            "url": "string",
+            "width": "number",
+            "height": "number"
+          },
+          "high": {
+            "url": "string",
+            "width": "number",
+            "height": "number"
+          },
+          "standard": {
+            "url": "string",
+            "width": "number",
+            "height": "number"
+          },
+          "maxres": {
+            "url": "string",
+            "width": "number",
+            "height": "number"
+          }
+        }
+      }
+    },
+    "listing": {
+      "type": {
+        "enabled": "Boolean",
+        "violations": "array",
+        "meta_ready": "Boolean",
+        "date_auction_from": "Date",
+        "date_auction_to": "Date",
+        "status_sold": "Date",
+        "searchable": "Boolean"
+      }
+    },
+    "createtime": {
+      "type": "Date",
+      "default": "$now",
+      "required": false
+    },
+    "updatetime": {
+      "type": "Date",
+      "default": "$now",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {
+    "user": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": "publisherId"
+    }
+  },
+  "acls": [
+  ],
+  "methods": []
+}
