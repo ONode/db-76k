@@ -5,6 +5,7 @@
 const
   _YouTube = require("../../common/logic/youTubebi.js"),
   clearall = require("../../common/logic/clearallfolders"),
+  pymanifest = require("../../common/logic/pympdmanifest"),
   _ = require("lodash"),
   express = require("express"),
   timeout = require("req-timeout"),
@@ -17,10 +18,18 @@ module.exports = function (app) {
     res.send("pong");
   });
   console.log("> created /ping request router");
-  app.get("/api/youtest/", function (req, res) {
+  app.get("/youtest/", function (req, res) {
     _YouTube.listitems();
   });
   console.log("> remove all uploaded tmp files with http://{domain}/removeallxxx");
+  //UwInFiAtfl0
+  app.use("/testmanifest", function (req, res) {
+    var p = new pymanifest();
+    var id_m = "UwInFiAtfl0";
+    p.getFormatJson(id_m, function (dat) {
+      return res.json(dat);
+    });
+  });
 };
 /*
  app.get("/api/config/", function (req, res) {

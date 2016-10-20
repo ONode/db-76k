@@ -53,7 +53,22 @@
             "width": "number",
             "height": "number"
           }
-        }
+        },
+        "format": [
+          {
+            "format": "string",
+            "url": "string",
+            "hd_manifest_url": "string",
+            "format_note": "string",
+            "vcodec": "string",
+            "acodec": "string",
+            "ext": "string",
+            "format_id": "string",
+            "filesize": "number",
+            "width": "number",
+            "height": "number"
+          }
+        ]
       }
     },
     "listing": {

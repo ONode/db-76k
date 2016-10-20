@@ -49,6 +49,8 @@
     "serve-favicon": "^2.0.1",
     "speakeasy": "https://github.com/speakeasyjs/speakeasy.git",
     "strong-arc": "1.8.9",
+    "python-shell": "~0.4.0",
+    "shelljs": "https://github.com/shelljs/shelljs.git",
     "strong-wait-till-listening": "https://github.com/strongloop/strong-wait-till-listening.git",
     "youtube-api": "2.0.4",
     "youtube-dl": "https://github.com/fent/node-youtube-dl.git",
