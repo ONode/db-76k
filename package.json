@@ -25,7 +25,6 @@
     "gulp": "^3.9.1",
     "gulp-async-func-runner": "https://github.com/Cellarise/gulp-async-func-runner.git",
     "gulp-rimraf": "^0.2.0",
-    "imagemagick": "https://github.com/rsms/node-imagemagick.git",
     "lodash": "4.16.1",
     "loopback": "2.34.1",
     "loopback-boot": "https://github.com/strongloop/loopback-boot.git",
