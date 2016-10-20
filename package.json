@@ -31,7 +31,7 @@
     "loopback-boot": "https://github.com/strongloop/loopback-boot.git",
     "loopback-component-explorer": "https://github.com/strongloop/loopback-component-explorer.git",
     "loopback-component-storage": "https://github.com/strongloop/loopback-component-storage.git",
-    "loopback-connector-mongodb": "git+https://github.com/strongloop/loopback-connector-mongodb.git",
+    "loopback-connector-mongodb": "https://github.com/strongloop/loopback-connector-mongodb.git",
     "loopback-connector-mysql": "^1.4.7",
     "loopback-connector-redis": "https://github.com/strongloop/loopback-connector-redis.git",
     "loopback-context": "https://github.com/strongloop/loopback-context.git",

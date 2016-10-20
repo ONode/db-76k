@@ -9,6 +9,9 @@
       "generated": true,
       "required": false
     },
+    "likes": {
+      "type": "number"
+    },
     "sync": {
       "type": {
         "url": "string"

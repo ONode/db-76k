@@ -8,53 +8,41 @@
     ]
   },
   "User": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "options": {
       "emailVerificationRequired": false
     },
     "public": false
   },
   "user": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "options": {
       "emailVerificationRequired": false
     },
     "public": true
   },
+  "Videotuba": {
+    "dataSource": "mlab",
+    "public": true
+  },
   "AccessToken": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "public": false
   },
   "ACL": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "public": false
   },
   "Role": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "public": false
   },
-  "CoffeeShop": {
-    "dataSource": "rocket_us_east",
-    "public": true
-  },
-  "Review": {
-    "dataSource": "rocket_us_east",
-    "public": true
-  },
   "Issue": {
-    "dataSource": "rocket_us_east",
-    "public": true
-  },
-  "Reviewer": {
-    "dataSource": "rocket_us_east",
-    "public": true
-  },
-  "Basemap": {
-    "dataSource": "rocket_us_east",
+    "dataSource": "mlab",
     "public": true
   },
   "Email": {

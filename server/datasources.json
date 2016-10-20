@@ -3,36 +3,9 @@
     "name": "db",
     "connector": "memory"
   },
-  "mysqlDs": {
-    "host": "demo.strongloop.com",
-    "port": 3306,
-    "database": "getting_started_intermediate",
-    "username": "demo",
-    "password": "L00pBack",
-    "name": "mysqlDs",
-    "connector": "mysql"
-  },
-  "mongoDs": {
-    "host": "demo.strongloop.com",
-    "port": 27017,
-    "database": "getting_started_intermediate",
-    "username": "demo",
-    "password": "L00pBack",
-    "name": "mongoDs",
-    "connector": "mongodb"
-  },
-  "rocket_us_east": {
-    "name": "rocket_us_east",
+  "mlab": {
     "connector": "mongodb",
-    "host": "iad2-c6-2.mongo.objectrocket.com",
-    "port": 52100,
-    "database": "coingallery",
-    "username": "userasianboken94",
-    "password": "b66b55e7cf73425a9c7be58937ahkde768"
-  },
-  "mlabheroku": {
-    "connector": "mongodb",
-    "url": "mongodb://usergraceg:cf73425a9b663428e7cf734XX39@ds023455.mlab.com:23455/heroku_dk71d7jj"
+    "url": "mongodb://heroku_8984v42l:bjb64skpre86ptva9et4ru64ng@ds061206.mlab.com:61206/heroku_8984v42l"
   },
   "gmail_data_source": {
     "connector": "mail",

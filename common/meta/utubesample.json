@@ -1,0 +1,51 @@
+{
+  "kind": "youtube#playlistItem",
+  "etag": "\"I_8xdZu766_FSaexEaDXTIfEWc0/yfG027uvwb_GckZnq3xEemLCh20\"",
+  "id": "UExyMm1MaFQ4Z0RVSy1wTW5UNHRKS1J3VW4yRnhOTmhBVS42Qzk5MkEzQjVFQjYwRDA4",
+  "snippet": {
+    "publishedAt": "2015-12-31T09:08:23.000Z",
+    "channelId": "UCXJX8gHnWo6QoyzcXUw9yHQ",
+    "title": "[직캠/Fancam] 150529 밤비노(BAMBINO) (은솔) 댄스공연 EXID-위아래 @ 강릉영동대",
+    "description": "Canon 70D, Sigma 120-300mm",
+    "thumbnails": {
+      "default": {
+        "url": "https://i.ytimg.com/vi/_0zC4YFgpbg/default.jpg",
+        "width": 120,
+        "height": 90
+      },
+      "medium": {
+        "url": "https://i.ytimg.com/vi/_0zC4YFgpbg/mqdefault.jpg",
+        "width": 320,
+        "height": 180
+      },
+      "high": {
+        "url": "https://i.ytimg.com/vi/_0zC4YFgpbg/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      },
+      "standard": {
+        "url": "https://i.ytimg.com/vi/_0zC4YFgpbg/sddefault.jpg",
+        "width": 640,
+        "height": 480
+      },
+      "maxres": {
+        "url": "https://i.ytimg.com/vi/_0zC4YFgpbg/maxresdefault.jpg",
+        "width": 1280,
+        "height": 720
+      }
+    },
+    "channelTitle": "Herol Kam",
+    "playlistId": "PLr2mLhT8gDUK-pMnT4tJKRwUn2FxNNhAU",
+    "position": 79,
+    "resourceId": {
+      "kind": "youtube#video",
+      "videoId": "_0zC4YFgpbg"
+    }
+  },
+  "contentDetails": {
+    "videoId": "_0zC4YFgpbg"
+  },
+  "status": {
+    "privacyStatus": "public"
+  }
+}
