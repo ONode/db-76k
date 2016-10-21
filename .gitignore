@@ -39,7 +39,7 @@ node_modules
 *.xml
 *.jpg
 *.sgi
-.env
+*.env
 .DS_Store
 .idea/*
 .project
@@ -47,3 +47,4 @@ node_modules
 \storage\tmp\tmpsgi\**
 storage
 localkey.txt
+/.env
