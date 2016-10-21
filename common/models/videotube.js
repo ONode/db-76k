@@ -37,7 +37,7 @@ module.exports = function (Videotuba) {
     returns: {
       arg: "token", type: "object", root: true, description: "Return value"
     },
-    http: {verb: "get", path: "/requestclip/:video_id"}
+    http: {verb: "get", path: "/requestclip/:video_id/"}
   });
 
 };

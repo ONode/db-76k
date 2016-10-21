@@ -295,7 +295,7 @@ dlworker.prototype.scanItemAt = function (clip_video_id, callbacknext) {
       }
       callbacknext(null, 'done');
     });
-  });
+  }.bind(this));
 };
 
 
