@@ -5,6 +5,11 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var app = module.exports = loopback();
+try {
+  require('dotenv').config();
+} catch (e) {
+
+}
 //app.use(loopback.token({model: app.models.accessToken}));
 app.start = function () {
   // start the web server

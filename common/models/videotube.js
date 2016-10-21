@@ -8,12 +8,12 @@ const logTag = "> basemap.js model",
     acknowledged: true
   }
 ;
-module.exports = function (Videotube) {
-  Videotube.mach_scanlist = function (cb) {
-    __ttub.listp(Videotube);
+module.exports = function (Videotuba) {
+  Videotuba.mach_scanlist = function (cb) {
+    __ttub.listp(Videotuba);
     cb(null, result_bool);
   };
-  Videotube.remoteMethod("mach_scanlist", {
+  Videotuba.remoteMethod("mach_scanlist", {
     description: ["Mech Job.."],
     accepts: [],
     returns: {

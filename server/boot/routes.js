@@ -20,13 +20,22 @@ module.exports = function (app) {
   console.log("> created /ping request router");
   app.get("/youtest/", function (req, res) {
     _YouTube.listitems();
+    return res.json({done: true});
   });
+
+  app.get("/testLocalLoop/", function (req, res) {
+    var Video_tuba_Meta = app.models.Videotuba;
+    _YouTube.listLoopLocal(Video_tuba_Meta);
+    return res.json({done: true});
+  });
+
   console.log("> remove all uploaded tmp files with http://{domain}/removeallxxx");
   //UwInFiAtfl0
-  app.use("/testmanifest", function (req, res) {
+  app.use("/testPy/", function (req, res) {
     var p = new pymanifest();
+    var id_mm = "z6t6AZJtrxQ";
     var id_m = "UwInFiAtfl0";
-    p.getFormatJson(id_m, function (dat) {
+    p.extFormatsV3(function (dat) {
       return res.json(dat);
     });
   });
