@@ -285,6 +285,20 @@ dlworker.prototype.gDataUpdateInfoApi = function (item, callback_next) {
     }
   }
 };
+
+dlworker.prototype.scanItemAt = function (clip_video_id, callbacknext) {
+  var pJsonNow = new pyJson();
+  pJsonNow.extFormatsV2(clip_video_id, function (dat) {
+    this.updateExtInfo(clip_video_id, dat, function (err) {
+      if (_.isError(err)) {
+        return callbacknext(err);
+      }
+      callbacknext(null, 'done');
+    });
+  });
+};
+
+
 dlworker.prototype.nextPage = function () {
   this._staticYT.addParam("pageToken", this.NextToken);
   console.log("> item", ">>>>>>>>> next page Info >>>>>>>>>>>");
@@ -341,8 +355,7 @@ dlworker.prototype.initList = function () {
               function (callbacknext) {
                 var pJsonNow = new pyJson();
                 var v_id_m = val.snippet.resourceId.videoId;
-                pJsonNow.getFormatJson(v_id_m, function (dat) {
-
+                pJsonNow.extFormatsV2(v_id_m, function (dat) {
                   this.updateExtInfo(v_id_m, dat, function (err) {
                     if (_.isError(err)) {
                       return callback_nxt_iter(err);
@@ -382,7 +395,6 @@ dlworker.prototype.initList = function () {
             console.error(err.message);
           }
         });
-
     }
   }.bind(this));
 };
@@ -401,9 +413,14 @@ module.exports = {
     dd_ml.setdb(video_clip_db);
     dd_ml.loopScanInternalList();
   },
+  updateSingleClip: function (video_cl_db, video_id, callback) {
+    var dd_ml = new dlworker();
+    dd_ml.setdb(video_cl_db);
+    dd_ml.scanItemAt(video_id, callback);
+  },
   listTesting: function () {
     var jText = new pyJson();
-    jText.extFormatsV3( function (list_array) {
+    jText.extFormatsV3(function (list_array) {
 
 
     });
