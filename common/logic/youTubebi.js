@@ -288,8 +288,11 @@ dlworker.prototype.gDataUpdateInfoApi = function (item, callback_next) {
 
 dlworker.prototype.scanItemAt = function (clip_video_id, callbacknext) {
   var pJsonNow = new pyJson();
+  console.log("> item", ">>>>>>>>> scan 1 >>>>>>>>>>>");
   pJsonNow.extFormatsV2(clip_video_id, function (dat) {
+    console.log("> item", ">>>>>>>>> scan 2 >>>>>>>>>>>");
     this.updateExtInfo(clip_video_id, dat, function (err) {
+      console.log("> item", ">>>>>>>>> scan 3 >>>>>>>>>>>");
       if (_.isError(err)) {
         return callbacknext(err);
       }
