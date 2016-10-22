@@ -43,7 +43,7 @@ function pdmExtract() {
 pdmExtract.prototype.extFormatsV2 = function (video_id, callback) {
   var container = "";
   const spawn = require('child_process').spawn;
-  const dl = spawn("youtube-dl", ['-j', '--', video_id]);
+  const dl = spawn("youtube-dl", ['--no-cache-dir', '-j', '--', video_id]);
   dl.stdout.on('data', function (data) {
     container += data;
   });
