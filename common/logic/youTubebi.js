@@ -286,7 +286,7 @@ dlworker.prototype.gDataUpdateInfoApi = function (item, callback_next) {
   }
 };
 
-dlworker.prototype.scanItemAt = function (clip_video_id, callbacknext) {
+dlworker.prototype.scanItemAt = function (clip_video_id, bool_return, callbacknext) {
   var pJsonNow = new pyJson();
   console.log("> item", ">>>>>>>>> scan 1 >>>>>>>>>>>");
   pJsonNow.extFormatsV2(clip_video_id, function (dat) {
@@ -296,8 +296,22 @@ dlworker.prototype.scanItemAt = function (clip_video_id, callbacknext) {
       if (_.isError(err)) {
         return callbacknext(err);
       }
-      callbacknext(null, 'done');
-    });
+      if (bool_return) {
+        this.video_clip_db.findOne({
+          where: {
+            "yt.clipid": clip_video_id
+          }
+        }, function (err, doc) {
+          if (_.isError(err)) {
+            return callbacknext(err);
+          }
+          console.log("> item", ">>>>>>>>> scan 4 >>>>>>>>>>>");
+          callbacknext(null, doc);
+        });
+      } else {
+        callbacknext(null, 'done');
+      }
+    }.bind(this));
   }.bind(this));
 };
 
@@ -416,10 +430,10 @@ module.exports = {
     dd_ml.setdb(video_clip_db);
     dd_ml.loopScanInternalList();
   },
-  updateSingleClip: function (video_cl_db, video_id, callback) {
+  updateSingleClip: function (video_cl_db, bool_return, video_id, callback) {
     var dd_ml = new dlworker();
     dd_ml.setdb(video_cl_db);
-    dd_ml.scanItemAt(video_id, callback);
+    dd_ml.scanItemAt(video_id, bool_return, callback);
   },
   listTesting: function () {
     var jText = new pyJson();

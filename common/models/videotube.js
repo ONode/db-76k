@@ -14,10 +14,19 @@ module.exports = function (Videotuba) {
     cb(null, result_bool);
   };
 
-  Videotuba.update_scan_item = function (_id, cb) {
-    __ttub.updateSingleClip(Videotuba, _id, function (err, done) {
-      cb(null, result_bool);
-    });
+  Videotuba.update_scan_item = function (_id, withdata, cb) {
+    __ttub.updateSingleClip(
+      Videotuba,
+      _.isUndefined(withdata) ? false : withdata,
+      _id,
+      function (err, done) {
+        var bool = _.isUndefined(withdata) ? false : withdata;
+        if (bool) {
+          cb(null, done);
+        } else {
+          cb(null, result_bool);
+        }
+      });
   };
 
   Videotuba.remoteMethod("mach_scanlist", {
@@ -32,7 +41,20 @@ module.exports = function (Videotuba) {
   Videotuba.remoteMethod("update_scan_item", {
     description: ["Update scanned item"],
     accepts: [
-      {arg: "video_id", type: "string", http: {source: "path"}, required: true, description: "id of the video id"}
+      {
+        arg: "video_id",
+        type: "string",
+        http: {source: "path"},
+        required: true,
+        description: "id of the video id"
+      },
+      {
+        arg: "withdata",
+        type: "Boolean",
+        http: {source: "query"},
+        required: false,
+        description: "with additional data attached at the callback"
+      }
     ],
     returns: {
       arg: "token", type: "object", root: true, description: "Return value"
