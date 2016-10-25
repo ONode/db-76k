@@ -28,6 +28,7 @@
     "loopback": "2.34.1",
     "loopback-boot": "https://github.com/strongloop/loopback-boot.git",
     "loopback-component-explorer": "https://github.com/strongloop/loopback-component-explorer.git",
+    "loopback-component-admin": "https://github.com/BoLaMN/loopback-component-admin.git",
     "loopback-component-storage": "https://github.com/strongloop/loopback-component-storage.git",
     "loopback-connector-mongodb": "https://github.com/strongloop/loopback-connector-mongodb.git",
     "loopback-mongo-aggregate-mixin": "https://github.com/BoLaMN/loopback-mongo-aggregate-mixin.git",

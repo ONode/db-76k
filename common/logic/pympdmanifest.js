@@ -37,8 +37,7 @@ function isValidJson(json) {
   }
 }
 function pdmExtract() {
-  const spawnProc = require('child_process').spawn;
-  this.spawnprocess = spawnProc;
+  this.spawnprocess = require('child_process').spawn;
   this.list_ids = [];
 }
 pdmExtract.prototype.fire = function (cmd_array) {

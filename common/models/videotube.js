@@ -37,17 +37,57 @@ module.exports = function (Videotuba) {
   };
   Videotuba.get_lucky_list = function (_count, cb) {
     var count_final = _count > 20 ? 20 : _count;
-    Videotuba.find({
-      where: {
-        "listing.enabled": true,
-        "listing.searchable": true
-      },
-      aggregate: {
-        $sample: {size: count_final}
+    console.log("> get sample list");
+    var where_cond = {
+      "listing.enabled": true,
+      "listing.searchable": true
+    };
+    /* Videotuba.find({
+     where: {
+     "listing.enabled": true,
+     "listing.searchable": true
+     },
+     /!* aggregate: [
+     {
+     $sample: {size: count_final}
+     }
+     ]
+     ,*!/
+     sort: "createtime DESC",
+     limit: count_final
+     }, function (err, results) {
+     if (_.isError(err)) {
+     return cb(err);
+     }
+     cb(null, results);
+     });*/
+
+    function getRandomArbitrary(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    Videotuba.count(where_cond, function (err, number) {
+      if (_.isError(err)) {
+        return cb(err);
       }
-    }, function (err, results) {
-      cb(null, results);
+      var __skip = parseInt(Math.random() * (number - _count));
+
+      Videotuba.find({
+        where: {
+          "listing.enabled": true,
+          "listing.searchable": true
+        },
+        sort: "createtime DESC",
+        limit: count_final,
+        skip: __skip
+      }, function (err, results) {
+        if (_.isError(err)) {
+          return cb(err);
+        }
+        cb(null, results);
+      });
     });
+
   };
 
   Videotuba.job_update_and_loop_channel = function (cb) {
