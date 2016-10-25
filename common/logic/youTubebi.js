@@ -23,12 +23,44 @@ var dlworker = function () {
   this.totalResult = 0;
   this.itemPerPage = 0;
   this.video_clip_db = null;
+  this.channel_list = [];
 };
-
+dlworker.prototype.set_channel_list = function (object_list) {
+  this.channel_list = object_list;
+};
 dlworker.prototype.setdb = function (object_db) {
   this.video_clip_db = object_db;
 };
+dlworker.prototype.start_channel_traveling = function (callback) {
+  if (this.channel_list.length > 0) {
+    async.eachSeries(
+      /**
+       * channel listing
+       */
+      this.channel_list,
 
+      /**
+       * support channel id
+       * @param channel_id id is now
+       * @param next_cb the callback
+       */
+      function (channel_id, next_cb) {
+        this.listYtdData(channel_id, function (err) {
+          next_cb();
+        });
+      }.bind(this),
+
+      /**
+       * error or complete
+       * @param err
+       */
+      function (err) {
+        console.log("> item out", "complete looping ids");
+      });
+  } else {
+    console.log("> item out", "end of looping");
+  }
+};
 var ensure_input = function (v) {
   if (_.isEmpty(v)) {
     return "";
@@ -89,6 +121,31 @@ var processThumbnails = function (from_snippet) {
   }
   return outp;
 };
+//private
+dlworker.prototype.constructFormat = function (formats_youtube_dl) {
+  var just_all_meta = [];
+  _.forEach(formats_youtube_dl, function (item) {
+    var extmeta = {
+      "format": ensure_input(item.format),
+      "url": ensure_input(item.url),
+      "hd_manifest_url": ensure_input(item.manifest_url),
+      "vcodec": ensure_input(item.vcodec),
+      "acodec": ensure_input(item.acodec),
+      "format_note": ensure_input(item.format_note),
+      "ext": ensure_input(item.ext),
+      "format_id": ensure_input(item.format_id),
+      "filesize": ensure_int(item.filesize),
+      "width": ensure_int(item.width),
+      "height": ensure_int(item.height)
+    };
+    if (_.isEmpty(extmeta.hd_manifest_url)) {
+      delete extmeta.hd_manifest_url;
+    }
+    just_all_meta.push(extmeta);
+  });
+  return just_all_meta;
+};
+
 dlworker.prototype.updateExtInfo = function (videoId, formats_array, callback_next) {
   if (_.isObject(this.video_clip_db) && _.isArray(formats_array)) {
     console.log("> extracted formats from id:: ", videoId);
@@ -107,31 +164,10 @@ dlworker.prototype.updateExtInfo = function (videoId, formats_array, callback_ne
         console.log("> err is findOne... ", err);
         return callback_next(err);
       }
-      var just_all_meta = [];
-      _.forEach(formats_array, function (item) {
-        var extmeta = {
-          "format": ensure_input(item.format),
-          "url": ensure_input(item.url),
-          "hd_manifest_url": ensure_input(item.manifest_url),
-          "vcodec": ensure_input(item.vcodec),
-          "acodec": ensure_input(item.acodec),
-          "format_note": ensure_input(item.format_note),
-          "ext": ensure_input(item.ext),
-          "format_id": ensure_input(item.format_id),
-
-          "filesize": ensure_int(item.filesize),
-          "width": ensure_int(item.width),
-          "height": ensure_int(item.height)
-        };
-        if (_.isEmpty(extmeta.hd_manifest_url)) {
-          delete extmeta.hd_manifest_url;
-        }
-        just_all_meta.push(extmeta);
-      });
 
       //console.log("> scan and updateAttributes", videoId, r);
       r.updateAttributes({
-        "yt.format": just_all_meta,
+        "yt.format": this.constructFormat(formats_array),
         "listing.enabled": true,
         "listing.searchable": true
       }, function (err, afterupdate) {
@@ -142,7 +178,9 @@ dlworker.prototype.updateExtInfo = function (videoId, formats_array, callback_ne
         console.log("> update completed for ::", videoId);
         callback_next();
       });
-    });
+
+    }.bind(this));
+
   } else {
     console.log("> validation on presistent Model failed:: ", videoId, this.video_clip_db);
   }
@@ -223,8 +261,142 @@ dlworker.prototype.loopScanInternalListNextPage = function () {
   this.paginationStartOffset += this.paginationPerPage;
   this.loopScanInternalList();
 };
+dlworker.prototype.checkVideoOrientationPortrait = function (formats) {
+  var is_portrait = false;
+  _.forEach(formats, function (format) {
+    if (_.isNaN(format.width) || _.isNaN(format.height)) {
+    } else {
+      if (_.parseInt(format.width) < _.parseInt(format.height)) {
+        return is_portrait = true;
+      }
+    }
+  });
+  return is_portrait;
+};
+/**
+ * use custom api to update channel info
+ * @param channel_id
+ * @param callback_next
+ */
+dlworker.prototype.listYtdData = function (channel_id, callback_next) {
+//getListVsIdsFromChannel
+  var pJsonNow = new pyJson();
+  var process_ids = [];
+  async.series([
+    function (callback) {
+      pJsonNow.harvestChannelContentIds(channel_id, function (list_ids) {
+        process_ids = list_ids;
+        callback(null, "next");
+      });
+    },
+    function (callback) {
+      async.eachSeries(
+        process_ids,
 
+        /**
+         * loop item
+         * @param err error is here
+         * @param result result
+         */
+        function (video_id, cb_next_item) {
 
+          if (_.isObject(this.video_clip_db)) {
+            this.video_clip_db.findOne({
+              where: {
+                "yt.clipid": video_id
+              }
+            }, function (err, result_document) {
+              if (_.isError(err)) {
+                console.log("technical error from db", err);
+                return;
+              }
+
+              var pyExt = new pyJson();
+              pyExt.extFullArchive(video_id, function (archive) {
+                if (!this.checkVideoOrientationPortrait(archive.formats)) {
+                  console.log("> ===========================================");
+                  console.log("> Video orientation not portrait we now skip");
+                  console.log("> ===========================================");
+                  return cb_next_item();
+                }
+                /**
+                 * result is empty and it is here
+                 */
+                if (_.isEmpty(result_document)) {
+                  console.log("> ==============================");
+                  console.log("> Create Clip Data ========= :: ");
+                  console.log("> ==============================");
+                  if (_.isFunction(this.video_clip_db.create)) {
+                    this.video_clip_db.create({
+                        "yt": {
+                          "clipid": video_id,
+                          "default_format_id": ensure_int(archive.format_id),
+                          "title": ensure_input(archive.title),
+                          "description": ensure_input(archive.description),
+                          "format": this.constructFormat(archive.formats)
+                        },
+                        "listing": {
+                          "enabled": false,
+                          "searchable": false
+                        }
+                      },
+                      function (err, clip) {
+                        console.log("> clip data created ======= :: ", video_id);
+                        if (_.isError(err)) {
+                          console.log("> error from after ======= :: ", err);
+                          return cb_next_item(err);
+                        }
+
+                        return cb_next_item();
+                      });
+                  }
+                } else {
+                  /**
+                   * do the update
+                   */
+                  this.updateExtInfo(video_id, archive.formats, function (err) {
+                    if (_.isError(err)) {
+                      console.log("> err", err);
+                      return;
+                    }
+                    console.log("> update clip format at ====== :: ", video_id);
+
+                    return cb_next_item();
+                  });
+                }
+                /**
+                 * done with it
+                 */
+              }.bind(this));
+              /**
+               * end find one
+               */
+            }.bind(this));
+            /**
+             * end extFullArchieve
+             */
+          }
+        }.bind(this),
+        /**
+         * end of eachSeries
+         * @param err error is here
+         */
+        function done(err) {
+          if (_.isError(err)) {
+            console.error(err.message);
+          }
+          callback(null, "tow");
+        }
+      );
+    }.bind(this)
+
+  ], function (err, results) {
+    if (_.isError(err)) {
+      console.error(err);
+    }
+    callback_next(null, "done");
+  });
+};
 dlworker.prototype.gDataUpdateInfoApi = function (item, callback_next) {
   if (show_debug_list) {
     console.log("> item", "================================");
@@ -321,7 +493,9 @@ dlworker.prototype.nextPage = function () {
   console.log("> item", ">>>>>>>>> next page Info >>>>>>>>>>>");
   this.initList();
 };
-
+/**
+ * use the google api provided to get update the user channel list.
+ */
 dlworker.prototype.initList = function () {
   console.log(playlistid);
   this._staticYT.getPlayListsItemsById(playlistid, function (error, result) {
@@ -434,6 +608,17 @@ module.exports = {
     var dd_ml = new dlworker();
     dd_ml.setdb(video_cl_db);
     dd_ml.scanItemAt(video_id, bool_return, callback);
+  },
+  update_db_by_channel: function (video_cl_db, channel_id, callback) {
+    var dd_ml = new dlworker();
+    dd_ml.setdb(video_cl_db);
+    dd_ml.listYtdData(channel_id, callback);
+  },
+  update_db_and_loop_channel: function (video_cl_db, callback) {
+    var dd_ml = new dlworker();
+    dd_ml.setdb(video_cl_db);
+    dd_ml.set_channel_list(require(".././meta/scan_channel_list.json"));
+    dd_ml.start_channel_traveling(callback);
   },
   listTesting: function () {
     var jText = new pyJson();

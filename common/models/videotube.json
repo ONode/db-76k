@@ -24,6 +24,7 @@
     "yt": {
       "type": {
         "clipid": "string",
+        "default_format_id": "number",
         "publishedT": "Date",
         "title": "string",
         "description": "string",

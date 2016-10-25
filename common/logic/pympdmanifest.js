@@ -7,43 +7,64 @@ const path = require('path');
 const _ = require('lodash');
 const fs = require('fs');
 const cmdline = "curl $(youtube-dl https://www.youtube.com/watch?v=iVAgTiBrrDA --youtube-include-dash-manifest --dump-intermediate-pages -s | grep manifest.google | cut -d ' ' -f 5)";
-function jExtractFormat(video_id_yt) {
-  var t = "youtube-dl -j ";
-  t += video_id_yt;
-  t += " | jq '.formats'";
-  //console.log("> print cmd:: ", t);
-  return t;
-}
-function jExtractFormatV2(video_id) {
-  var blist = [];
-  blist.push("-j");
-  blist.push(video_id);
-  blist.push("|");
-  blist.push("jq");
-  blist.push("'.formats'");
-  console.log("> list", blist);
-  return blist;
-}
 function jOutAll(video_id_yt) {
   var t = "youtube-dl -j ";
   t += video_id_yt;
   return t;
 }
-function pdmExtract() {
-  /* if (!shell.which('curl')) {
-   shell.echo('Sorry, this script requires curl');
-   shell.exit(1);
-   }
-
-   if (!shell.which('youtube-dl')) {
-   shell.echo('Sorry, this script requires youtube-dl');
-   shell.exit(1);
-   }*/
+function cliVideoChannelGetIds(channel_id) {
+  var cmd = [];
+  cmd.push(channel_id);
+  cmd.push("--get-id");
+  console.log("> cmd", cmd);
+  return cmd;
 }
+function cliVideoFormat(videoid) {
+  var cmd = [];
+  cmd.push("--no-cache-dir");
+  cmd.push("-j");
+  cmd.push("--");
+  cmd.push(videoid);
+  console.log("> cmd", cmd);
+  return cmd;
+}
+function isValidJson(json) {
+  try {
+    JSON.parse(json);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function pdmExtract() {
+  const spawnProc = require('child_process').spawn;
+  this.spawnprocess = spawnProc;
+  this.list_ids = [];
+}
+pdmExtract.prototype.fire = function (cmd_array) {
+  return this.spawnprocess("youtube-dl", cmd_array);
+};
+pdmExtract.prototype.extFullArchive = function (video_id, callback) {
+  var container = "";
+  const dl = this.fire(cliVideoFormat(video_id));
+  dl.stdout.on('data', function (data) {
+    container += data;
+  });
+  dl.stderr.on('data', function (data) {
+    console.log('youtube-d stderr: ' + data);
+  });
+  dl.on('close', function (code) {
+    if (code !== 0) {
+      console.log('youtube-dl has an exit code: ' + code);
+    } else {
+      var out = JSON.parse(container);
+      callback(out);
+    }
+  });
+};
 pdmExtract.prototype.extFormatsV2 = function (video_id, callback) {
   var container = "";
-  const spawn = require('child_process').spawn;
-  const dl = spawn("youtube-dl", ['--no-cache-dir', '-j', '--', video_id]);
+  const dl = this.fire(cliVideoFormat(video_id));
   dl.stdout.on('data', function (data) {
     container += data;
   });
@@ -68,8 +89,7 @@ pdmExtract.prototype.extFormatsV2 = function (video_id, callback) {
 };
 pdmExtract.prototype.extFormatsV3 = function (callback) {
   var container = "", video_id = "-f7zZt6ad-A";
-  const spawn = require('child_process').spawn;
-  const dl = spawn("youtube-dl", ['-j', '--', video_id]);
+  const dl = this.fire(['-j', '--', video_id]);
   dl.stdout.on('data', function (data) {
     container += data;
   });
@@ -92,11 +112,32 @@ pdmExtract.prototype.extFormatsV3 = function (callback) {
     }
   });
 };
+pdmExtract.prototype.harvestChannelContentIds = function (channel_id, callback) {
+  const red = this.fire(cliVideoChannelGetIds(channel_id));
+  var i = 0;
+  red.stdout.on('data', function (buffer) {
+    var get_video_id = buffer.toString('utf8');
+    console.log('> item: ', i, get_video_id);
+    this.list_ids.push(get_video_id);
+    i++;
+  }.bind(this));
+  red.stderr.on('data', function (data) {
+    console.log('youtube-d stderr: ' + data);
+  });
+  red.on('close', function (code) {
+    if (code !== 0) {
+      console.log('youtube-dl has an exit code: ' + code);
+    } else {
+      var is_array = _.isArray(this.list_ids);
+      console.log("harvested in array", is_array);
+      callback(this.list_ids);
+    }
+  }.bind(this));
+};
 pdmExtract.prototype.extFormatsV1 = function (video_id, callback) {
   var container = "";
-  const spawn = require('child_process').spawn;
-  const dl = spawn("youtube-dl", ['-j', '--', video_id]);
-  const jq = spawn("jq", ["'.formats'"]);
+  const dl = this.fire(['-j', '--', video_id]);
+  const jq = this.spawnprocess("jq", ["'.formats'"]);
   dl.stdout.on('data', function (data) {
     jq.stdin.write(data);
   });
@@ -125,16 +166,6 @@ pdmExtract.prototype.extFormatsV1 = function (video_id, callback) {
     }
   });
 };
-
-function isValidJson(json) {
-  try {
-    JSON.parse(json);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
 /**
  * Delete all null (or undefined) properties from an object.
  * Set 'recurse' to true if you also want to delete properties in nested objects.
@@ -147,8 +178,7 @@ function delete_null_properties(test, recurse) {
       delete_null_properties(test[i], recurse);
     }
   }
-}
-
+};
 function dateReviver(key, value) {
   var a;
   if (typeof value === 'string') {
@@ -160,5 +190,4 @@ function dateReviver(key, value) {
   }
   return value;
 };
-
 module.exports = pdmExtract;

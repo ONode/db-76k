@@ -13,7 +13,14 @@ module.exports = function (Videotuba) {
     __ttub.listp(Videotuba);
     cb(null, result_bool);
   };
-
+  Videotuba.job_update_channel = function (_channel_id, cb) {
+    __ttub.update_db_by_channel(Videotuba, _channel_id, function () {
+      console.log(logTag, "========== ***************** =========");
+      console.log(logTag, "========== All jobs are done =========");
+      console.log(logTag, "========== ***************** =========");
+    });
+    cb(null, result_bool);
+  };
   Videotuba.update_scan_item = function (_id, withdata, cb) {
     __ttub.updateSingleClip(
       Videotuba,
@@ -28,9 +35,55 @@ module.exports = function (Videotuba) {
         }
       });
   };
+  Videotuba.get_lucky_list = function (_count, cb) {
+    var count_final = _count > 20 ? 20 : _count;
+    Videotuba.find({
+      where: {
+        "listing.enabled": true,
+        "listing.searchable": true
+      },
+      aggregate: {
+        $sample: {size: count_final}
+      }
+    }, function (err, results) {
+      cb(null, results);
+    });
+  };
+
+  Videotuba.job_update_and_loop_channel = function (cb) {
+    __ttub.update_db_and_loop_channel(Videotuba, function (done) {
+
+    });
+    cb(null, result_bool);
+  };
+
+  Videotuba.remoteMethod("job_update_and_loop_channel", {
+    description: ["Cron job update item from loop channel."],
+    accepts: [],
+    returns: {
+      arg: "token", type: "object", root: true, description: "Return value"
+    },
+    http: {verb: "get", path: "/job_lp_channel/"}
+  });
+
+  Videotuba.remoteMethod("job_update_channel", {
+    description: ["Cron job call to update the db id items by input channel id"],
+    accepts: [{
+      arg: "channel_id",
+      type: "string",
+      http: {source: "path"},
+      required: true,
+      description: "id of the video id"
+    }],
+    returns: {
+      arg: "token", type: "object", root: true, description: "Return value"
+    },
+    http: {verb: "get", path: "/job_update_channel/:channel_id"}
+  });
+
 
   Videotuba.remoteMethod("mach_scanlist", {
-    description: ["Mech Job.."],
+    description: ["Cron job to the list locally.."],
     accepts: [],
     returns: {
       arg: "token", type: "object", root: true, description: "Return value"
@@ -38,8 +91,25 @@ module.exports = function (Videotuba) {
     http: {verb: "get", path: "/scanlist"}
   });
 
+
+  Videotuba.remoteMethod("get_lucky_list", {
+    description: ["Cron job to the list locally.."],
+    accepts: [{
+      arg: "count",
+      type: "number",
+      http: {source: "path"},
+      required: true,
+      description: "the count number of the ramdom list"
+    }],
+    returns: {
+      arg: "luckylist", type: "array", root: true, description: "Return value"
+    },
+    http: {verb: "get", path: "/imlucky/:count"}
+  });
+
+
   Videotuba.remoteMethod("update_scan_item", {
-    description: ["Update scanned item"],
+    description: ["Prompted by remote api to update scanned item"],
     accepts: [
       {
         arg: "video_id",
