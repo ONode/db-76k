@@ -285,8 +285,12 @@ dlworker.prototype.listYtdData = function (channel_id, callback_next) {
   async.series([
     function (callback) {
       pJsonNow.harvestChannelContentIds(channel_id, function (list_ids) {
-        process_ids = list_ids;
-        callback(null, "next");
+        if (_.isArray(list_ids)) {
+          process_ids = list_ids;
+          callback(null, "next");
+        } else {
+          callback(null, "next channel");
+        }
       });
     },
     function (callback) {
@@ -294,13 +298,13 @@ dlworker.prototype.listYtdData = function (channel_id, callback_next) {
         process_ids,
 
         /**
-         * loop item
+         * loop item ID
          * @param err error is here
          * @param result result
          */
         function (video_id, cb_next_item) {
 
-          if (_.isObject(this.video_clip_db)) {
+          if (_.isObject(this.video_clip_db) && !_.isEmpty(video_id) && !_.isUndefined(video_id)) {
             this.video_clip_db.findOne({
               where: {
                 "yt.clipid": video_id
@@ -375,6 +379,11 @@ dlworker.prototype.listYtdData = function (channel_id, callback_next) {
             /**
              * end extFullArchieve
              */
+          } else {
+            /**
+             * NOT ID
+             */
+            return cb_next_item();
           }
         }.bind(this),
         /**

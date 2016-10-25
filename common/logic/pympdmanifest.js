@@ -122,15 +122,15 @@ pdmExtract.prototype.harvestChannelContentIds = function (channel_id, callback) 
   }.bind(this));
   red.stderr.on('data', function (data) {
     console.log('youtube-d stderr: ' + data);
+
   });
   red.on('close', function (code) {
     if (code !== 0) {
       console.log('youtube-dl has an exit code: ' + code);
-    } else {
-      var is_array = _.isArray(this.list_ids);
-      console.log("harvested in array", is_array);
-      callback(this.list_ids);
     }
+    var is_array = _.isArray(this.list_ids);
+    console.log("harvested in array", is_array);
+    callback(this.list_ids);
   }.bind(this));
 };
 pdmExtract.prototype.extFormatsV1 = function (video_id, callback) {
