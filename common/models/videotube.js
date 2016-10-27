@@ -77,7 +77,7 @@ module.exports = function (Videotuba) {
           "listing.enabled": true,
           "listing.searchable": true
         },
-        sort: "createtime DESC",
+        order: "createtime DESC",
         limit: count_final,
         skip: __skip
       }, function (err, results) {
